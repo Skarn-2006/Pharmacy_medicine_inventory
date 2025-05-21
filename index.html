@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pharma Inventory Management</title>
+  <style>
+    /* Reset & base styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f9fc;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background-color: #005f73;
+      color: #e0fbfc;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      user-select: none;
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    /* Container for logos */
+    .logo-container {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .logo-container img {
+      height: 54px;
+      width: auto;
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.2));
+      transition: transform 0.3s ease;
+      cursor: default;
+    }
+    .logo-container img:hover {
+      transform: scale(1.1);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    h2 {
+      margin-top: 0;
+      color: #0a9396;
+      font-weight: 600;
+    }
+
+    /* INVENTORY TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    thead {
+      background-color: #94d2bd;
+      color: #001219;
+    }
+    thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+    tbody td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+    }
+    tbody tr:hover {
+      background-color: #e0f2f1;
+    }
+    button.action-btn {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      margin: 0 0.15rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    button.action-btn.edit {
+      color: #0a9396;
+    }
+    button.action-btn.edit:hover {
+      background-color: #94d2bd;
+      color: #001219;
+    }
+    button.action-btn.delete {
+      color: #bb3e03;
+    }
+    button.action-btn.delete:hover {
+      background-color: #fb8500;
+      color: white;
+    }
+
+    /* ADD/EDIT FORM */
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 1rem;
+      align-items: end;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #005f73;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      border: 1.5px solid #94d2bd;
+      border-radius: 6px;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus {
+      border-color: #0a9396;
+      outline: none;
+    }
+    button#submit-btn {
+      background-color: #0a9396;
+      color: white;
+      padding: 0.65rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button#submit-btn:hover {
+      background-color: #005f73;
+    }
+    .message {
+      margin-top: 0.8rem;
+      font-weight: 600;
+      color: #bb3e03;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      form {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 1rem;
+      }
+      button#submit-btn {
+        grid-column: 1 / -1;
+      }
+      .logo-container {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pharma Inventory Management</h1>
+    <div class="logo-container" aria-label="Logos of WHO and partner hospitals">
+      <!-- WHO logo (official) -->
+      
+        <img src="image.png" alt="WHO Logo" />
+      </a>
+      <!-- Example hospital icon 1 -->
+      <img src="OIP.jpeg" alt="Hospital Icon 1" title="Hospital" />
+     
+    </div>
+  </header>
+  <main>
+    <section aria-label="Inventory list">
+      <h2>Current Inventory</h2>
+      <table id="inventory-table" aria-describedby="inventory-desc">
+        <caption id="inventory-desc" class="visually-hidden">
+          List of all medicines in inventory with quantity, expiration date, batch number, and action buttons to edit or delete entries.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Medicine Name</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Expiration Date</th>
+            <th scope="col">Batch Number</th>
+            <th scope="col" aria-label="Actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Inventory items will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-label="Add or edit medicine form">
+      <h2 id="form-title">Add New Medicine</h2>
+      <form id="medicine-form" autocomplete="off">
+        <div>
+          <label for="med-name">Medicine Name</label>
+          <input type="text" id="med-name" name="med-name" required placeholder="Paracetamol" />
+        </div>
+        <div>
+          <label for="med-quantity">Quantity</label>
+          <input type="number" id="med-quantity" name="med-quantity" min="1" required placeholder="100" />
+        </div>
+        <div>
+          <label for="med-expiry">Expiration Date</label>
+          <input type="date" id="med-expiry" name="med-expiry" required />
+        </div>
+        <div>
+          <label for="med-batch">Batch Number</label>
+          <input type="text" id="med-batch" name="med-batch" required placeholder="B12345" />
+        </div>
+        <div>
+          <button type="submit" id="submit-btn">Add Medicine</button>
+        </div>
+      </form>
+      <p id="form-message" class="message" role="alert" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const form = document.getElementById('medicine-form');
+      const medNameInput = document.getElementById('med-name');
+      const medQuantityInput = document.getElementById('med-quantity');
+      const medExpiryInput = document.getElementById('med-expiry');
+      const medBatchInput = document.getElementById('med-batch');
+      const submitBtn = document.getElementById('submit-btn');
+      const formTitle = document.getElementById('form-title');
+      const formMessage = document.getElementById('form-message');
+      const inventoryTableBody = document.querySelector('#inventory-table tbody');
+
+      let inventory = [];
+      let editIndex = -1;
+
+      // Utility function to show message
+      function showMessage(message, isError = false) {
+        formMessage.textContent = message;
+        formMessage.style.color = isError ? '#bb3e03' : '#005f73';
+        if (message) {
+          setTimeout(() => {
+            formMessage.textContent = '';
+          }, 4000);
+        }
+      }
+
+      // Load inventory from localStorage
+      function loadInventory() {
+        const stored = localStorage.getItem('pharmaInventory');
+        inventory = stored ? JSON.parse(stored) : [];
+      }
+
+      // Save inventory to localStorage
+      function saveInventory() {
+        localStorage.setItem('pharmaInventory', JSON.stringify(inventory));
+      }
+
+      // Validate expiration date is in the future
+      function isValidExpiry(dateString) {
+        const today = new Date();
+        const expiryDate = new Date(dateString);
+        expiryDate.setHours(0,0,0,0);
+        today.setHours(0,0,0,0);
+        return expiryDate >= today;
+      }
+
+      // Render inventory table rows
+      function renderInventory() {
+        inventoryTableBody.innerHTML = '';
+        if (inventory.length === 0) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 5;
+          td.style.textAlign = 'center';
+          td.textContent = 'No medicines in inventory.';
+          tr.appendChild(td);
+          inventoryTableBody.appendChild(tr);
+          return;
+        }
+
+        inventory.forEach((item, index) => {
+          const tr = document.createElement('tr');
+
+          const tdName = document.createElement('td');
+          tdName.textContent = item.name;
+          tr.appendChild(tdName);
+
+          const tdQuantity = document.createElement('td');
+          tdQuantity.textContent = item.quantity;
+          tr.appendChild(tdQuantity);
+
+          const tdExpiry = document.createElement('td');
+          tdExpiry.textContent = item.expiry;
+          tr.appendChild(tdExpiry);
+
+          const tdBatch = document.createElement('td');
+          tdBatch.textContent = item.batch;
+          tr.appendChild(tdBatch);
+
+          const tdActions = document.createElement('td');
+
+          const editBtn = document.createElement('button');
+          editBtn.className = 'action-btn edit';
+          editBtn.title = 'Edit this medicine';
+          editBtn.setAttribute('aria-label', `Edit medicine ${item.name}`);
+          editBtn.innerHTML = '&#9998;'; // pencil icon
+          editBtn.addEventListener('click', () => startEdit(index));
+          tdActions.appendChild(editBtn);
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'action-btn delete';
+          deleteBtn.title = 'Delete this medicine';
+          deleteBtn.setAttribute('aria-label', `Delete medicine ${item.name}`);
+          deleteBtn.innerHTML = '&#10005;';  // cross icon
+          deleteBtn.addEventListener('click', () => deleteMedicine(index));
+          tdActions.appendChild(deleteBtn);
+
+          tr.appendChild(tdActions);
+          inventoryTableBody.appendChild(tr);
+        });
+      }
+
+      // Start editing an existing item
+      function startEdit(index) {
+        const item = inventory[index];
+        medNameInput.value = item.name;
+        medQuantityInput.value = item.quantity;
+        medExpiryInput.value = item.expiry;
+        medBatchInput.value = item.batch;
+
+        formTitle.textContent = 'Edit Medicine';
+        submitBtn.textContent = 'Save Changes';
+        editIndex = index;
+        medNameInput.focus();
+      }
+
+      // Reset form to add new
+      function resetForm() {
+        form.reset();
+        formTitle.textContent = 'Add New Medicine';
+        submitBtn.textContent = 'Add Medicine';
+        editIndex = -1;
+      }
+
+      // Delete medicine by index
+      function deleteMedicine(index) {
+        const confirmDelete = confirm(`Are you sure you want to delete "${inventory[index].name}" from inventory?`);
+        if (!confirmDelete) return;
+        inventory.splice(index, 1);
+        saveInventory();
+        renderInventory();
+        showMessage('Medicine deleted successfully.');
+        if(editIndex === index) {
+          resetForm();
+        }
+      }
+
+      // Handle form submission for add/edit
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const name = medNameInput.value.trim();
+        const quantity = Number(medQuantityInput.value);
+        const expiry = medExpiryInput.value;
+        const batch = medBatchInput.value.trim();
+
+        if (!name || quantity < 1 || !expiry || !batch) {
+          showMessage('Please fill all fields correctly.', true);
+          return;
+        }
+
+        if(!isValidExpiry(expiry)) {
+          showMessage('Expiration date must be today or in the future.', true);
+          return;
+        }
+
+        const newItem = { name, quantity, expiry, batch };
+
+        if(editIndex > -1) {
+          // Edit existing
+          inventory[editIndex] = newItem;
+          showMessage('Medicine updated successfully.');
+        } else {
+          // Add new
+          inventory.push(newItem);
+          showMessage('Medicine added successfully.');
+        }
+
+        saveInventory();
+        renderInventory();
+        resetForm();
+      });
+
+      // Initialize app
+      (function init(){
+        loadInventory();
+        renderInventory();
+      })();
+
+    })();
+  </script>
+</body>
+</html>
+
